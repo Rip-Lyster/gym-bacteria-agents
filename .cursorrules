@@ -1,0 +1,123 @@
+# Gym Bacteria Agents - .cursorrules File
+
+# This .cursorrules file defines cursor navigation and movement rules tailored for the Gym Bacteria Agents project.
+
+# RULES OVERVIEW
+# This project has a modern web architecture, featuring Next.js for the frontend, Flask for the backend, and extensive use of TypeScript and Python.
+# These rules prioritize:
+# - Smooth transitions between TypeScript, Python, and configuration files.
+# - Enhanced usability for developers working on training planning and progress tracking features.
+
+[frontend/nextjs]
+# Navigation rules for TypeScript files in the `app/` directory.
+root: app/
+fileTypes: .ts, .tsx
+
+# Cursor rules for TypeScript development:
+- indentStyle: spaces
+- indentSize: 2
+- alignOnColon: true
+- wrapLines: 120
+- autoCloseTags: true
+- matchBrackets: true
+- jumpBetweenBrackets: true
+- goToDefinition: enabled
+- autoImport: enabled
+
+# TypeScript and Next.js Specific Guidelines:
+- Follow functional and declarative programming patterns; avoid classes.
+- Prefer iteration and modularization over duplication.
+- Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
+- Structure files as: exported component, subcomponents, helpers, static content, types.
+- Use Shadcn UI, Radix UI, and Tailwind for styling.
+- Use TypeScript interfaces over types, and avoid enums; prefer maps.
+
+[backend/flask]
+# Navigation rules for Python files in the `api/` directory.
+root: api/
+fileTypes: .py
+
+# Cursor rules for Python development:
+- indentStyle: spaces
+- indentSize: 4
+- pep8Compliance: enforce
+- highlightTodos: true
+- autoFormatOnSave: true
+- jumpBetweenFunctions: enabled
+- goToDefinition: enabled
+
+[configurations]
+# Navigation rules for configuration files.
+root: .
+fileTypes: .json, .js, .txt, .nvmrc, .python-version
+
+# Cursor rules for configuration files:
+- indentStyle: spaces
+- indentSize: 2
+- alignOnColon: true
+- highlightSyntax: true
+- autoCompletion: enabled
+- commentBlocks: true
+
+[docs/documentation]
+# Navigation rules for markdown files in the `docs/` directory.
+root: docs/
+fileTypes: .md
+
+# Documentation Requirements:
+- All new features must have corresponding documentation
+- Document architecture decisions in ADR format
+- Include code examples for API endpoints
+- Maintain up-to-date setup instructions
+- Version documentation alongside code changes
+
+# Cursor rules for documentation editing:
+- indentStyle: spaces
+- indentSize: 2
+- lineWrap: enabled
+- markdownSyntaxHighlighting: true
+- autoLinkHeaders: true
+- previewMarkdown: enabled
+
+# Documentation Structure:
+- api/         # API documentation and endpoints
+- setup/       # Installation and configuration guides
+- features/    # Feature documentation and usage
+- adr/         # Architecture Decision Records
+- planning/    # Sprint planning and roadmap
+
+[planning/changes]
+# Rules for implementing changes
+- documentFirst: true  # Write documentation before implementation
+- createPlanFile: true # Create a plan.md for significant changes
+- reviewSteps:
+  - Document current state
+  - Outline proposed changes
+  - List affected files
+  - Define testing strategy
+  - Update relevant documentation
+
+# Planning Requirements:
+- Create design documents for new features
+- Document dependencies and potential impacts
+- Include rollback procedures
+- Define success criteria
+- Estimate complexity and time requirements
+
+[shared/common]
+# Common rules applicable across all file types.
+- autoSave: enabled
+- trailingWhitespace: remove
+- newLineAtEOF: ensure
+- fileEncoding: utf-8
+- searchCaseSensitive: false
+- regexSearch: true
+
+# Additional Guidelines for Performance and Optimization:
+- Minimize 'use client', 'useEffect', and 'setState'; favor React Server Components (RSC).
+- Wrap client components in Suspense with fallback.
+- Use dynamic loading for non-critical components.
+- Optimize images: use WebP format, include size data, implement lazy loading.
+- Follow Next.js documentation for Data Fetching, Rendering, and Routing.
+
+# END OF FILE

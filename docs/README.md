@@ -1,26 +1,74 @@
-# Documentation
+# Gym Bacteria Agents Documentation
 
-Welcome to the Gym Bacteria Agents documentation. This directory contains all the documentation for the project.
+Welcome to the Gym Bacteria Agents documentation. This documentation is organized into several key sections to help you find the information you need quickly.
 
 ## Documentation Structure
 
-- [`getting-started.md`](getting-started.md) - Setup and installation instructions
-- [`api-reference.md`](api-reference.md) - API endpoints and usage
-- [`development.md`](development.md) - Development guidelines and processes
-- [`architecture.md`](architecture.md) - System architecture and design decisions
+### 📚 Quick Links
+- [Getting Started](setup/installation.md) - Set up your development environment
+- [API Reference](api/endpoints.md) - Detailed API documentation
+- [Features Overview](features/overview.md) - Learn about available features
+- [Project Roadmap](planning/roadmap.md) - Future development plans
 
-## Quick Links
+### 📁 Directory Structure
 
-- [Project README](../README.md)
-- [Getting Started Guide](getting-started.md)
-- [API Reference](api-reference.md)
+```
+docs/
+├── api/          - API documentation and endpoint specifications
+├── setup/        - Installation and configuration guides
+├── features/     - Feature documentation and usage guides
+├── adr/          - Architecture Decision Records
+└── planning/     - Project planning and roadmap
+```
 
 ## Contributing to Documentation
 
-The documentation is written in Markdown format. To contribute:
+### Documentation Standards
+- All documentation is written in Markdown
+- Code examples should be properly formatted and tested
+- Keep documentation up to date with code changes
+- Include practical examples where possible
+- Use clear, concise language
 
-1. Create or edit `.md` files in the `/docs` directory
-2. Use clear, concise language
-3. Include code examples where appropriate
-4. Add links to related documentation
-5. Submit a pull request with your changes 
+### Adding New Documentation
+1. Choose the appropriate section for your documentation
+2. Follow the existing templates in each directory
+3. Update this README if adding new sections
+4. Ensure all links are relative and working
+
+## Documentation Sections
+
+### API Documentation
+- API endpoints and usage
+- Request/response examples
+- Authentication details
+- Rate limiting and quotas
+
+### Setup Guides
+- Installation instructions
+- Configuration guides
+- Environment setup
+- Troubleshooting
+
+### Feature Documentation
+- Feature descriptions
+- Usage examples
+- Best practices
+- Configuration options
+
+### Architecture Decision Records (ADR)
+- Major architectural decisions
+- Technical choices
+- Implementation rationales
+- Trade-off discussions
+
+### Planning
+- Project roadmap
+- Sprint planning
+- Feature proposals
+- Release notes
+
+## Getting Help
+- Open an issue for documentation improvements
+- Submit pull requests for corrections
+- Join our community discussions 
