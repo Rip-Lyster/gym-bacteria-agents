@@ -105,3 +105,26 @@ health = response.json()
 | Date | Changes |
 |------|---------|
 | 2024-01-04 | Initial implementation | 
+
+# API Documentation
+
+## Architecture
+For details on how API communication is structured in the frontend, see [ADR 002: API Service Layer Architecture](../adr/002-api-service-layer.md).
+
+## Endpoints
+
+### Health Check
+- **URL**: `/api/health`
+- **Method**: `GET`
+- **Response**:
+  ```typescript
+  interface HealthCheckResponse {
+    status: string;
+  }
+  ```
+- **Usage**:
+  ```typescript
+  import { getHealthStatus } from '@/services/api';
+  
+  const status = await getHealthStatus();
+  ``` 

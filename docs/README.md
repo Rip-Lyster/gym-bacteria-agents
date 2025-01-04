@@ -8,6 +8,7 @@ Welcome to the Gym Bacteria Agents documentation. This documentation is organize
 - [Getting Started](setup/installation.md) - Set up your development environment
 - [API Reference](api/endpoints.md) - Detailed API documentation
 - [Features Overview](features/overview.md) - Learn about available features
+- [Changelog](changelog/000-template.md) - Record of major changes
 - [Project Roadmap](planning/roadmap.md) - Future development plans
 
 ### 📁 Directory Structure
@@ -17,7 +18,7 @@ docs/
 ├── api/          - API documentation and endpoint specifications
 ├── setup/        - Installation and configuration guides
 ├── features/     - Feature documentation and usage guides
-├── adr/          - Architecture Decision Records
+├── changelog/    - Record of major changes and features
 └── planning/     - Project planning and roadmap
 ```
 
@@ -56,11 +57,11 @@ docs/
 - Best practices
 - Configuration options
 
-### Architecture Decision Records (ADR)
-- Major architectural decisions
-- Technical choices
-- Implementation rationales
-- Trade-off discussions
+### Changelog
+- Record of major changes
+- New feature additions
+- Significant updates
+- Integration of new services
 
 ### Planning
 - Project roadmap

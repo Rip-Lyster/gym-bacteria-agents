@@ -7,6 +7,7 @@
 # These rules prioritize:
 # - Smooth transitions between TypeScript, Python, and configuration files.
 # - Enhanced usability for developers working on training planning and progress tracking features.
+# - Comprehensive documentation both inline and in the docs repository.
 
 [frontend/nextjs]
 # Navigation rules for TypeScript files in the `app/` directory.
@@ -66,24 +67,28 @@ fileTypes: .md
 
 # Documentation Requirements:
 - All new features must have corresponding documentation
-- Document architecture decisions in ADR format
+- Major changes must be logged in changelog format
+  - Required for:
+    - New major features
+    - Significant changes to existing features
+    - Integration of new third-party services
+  - Format:
+    - Number entries sequentially (000-, 001-)
+    - Include date (YYYY-MM-DD)
+    - Brief "What:" description
+    - One-line "Why:" explanation
 - Include code examples for API endpoints
 - Maintain up-to-date setup instructions
 - Version documentation alongside code changes
-
-# Cursor rules for documentation editing:
-- indentStyle: spaces
-- indentSize: 2
-- lineWrap: enabled
-- markdownSyntaxHighlighting: true
-- autoLinkHeaders: true
-- previewMarkdown: enabled
 
 # Documentation Structure:
 - api/         # API documentation and endpoints
 - setup/       # Installation and configuration guides
 - features/    # Feature documentation and usage
-- adr/         # Architecture Decision Records
+- changelog/   # Project changelog
+  - Simple record of major changes
+  - Numbered sequentially (000-, 001-)
+  - Each entry: what changed and why
 - planning/    # Sprint planning and roadmap
 
 [planning/changes]
@@ -112,6 +117,28 @@ fileTypes: .md
 - fileEncoding: utf-8
 - searchCaseSensitive: false
 - regexSearch: true
+- enforceDocumentation: true  # Enforce documentation rules
+- validateDocComments: true   # Validate documentation format
+
+documentationChecks:
+  - validateJSDoc: true
+  - validatePythonDocstrings: true
+  - requireExamples: true
+  - requireTypeInfo: true
+  - requireReturnDesc: true
+  - requireParamDesc: true
+  - maxLineLength: 100
+  - enforceMarkdownLint: true
+
+# Additional Guidelines for Documentation:
+- Document all public APIs and components
+- Include usage examples for complex features
+- Keep documentation up to date with code changes
+- Use clear and concise language
+- Include troubleshooting sections for common issues
+- Document breaking changes and migrations
+- Include visual diagrams for complex workflows
+- Reference related documentation when appropriate
 
 # Additional Guidelines for Performance and Optimization:
 - Minimize 'use client', 'useEffect', and 'setState'; favor React Server Components (RSC).
@@ -119,5 +146,35 @@ fileTypes: .md
 - Use dynamic loading for non-critical components.
 - Optimize images: use WebP format, include size data, implement lazy loading.
 - Follow Next.js documentation for Data Fetching, Rendering, and Routing.
+
+[documentation/rules]
+# Documentation Standards for Code Files
+inlineDocumentation:
+  typescript:
+    - Use JSDoc comments for all components, functions, and interfaces
+    - Document props, return types, and side effects
+    - Include examples for complex logic
+    - Document state management and hooks
+    - Format: /**\n * Description\n * @param {Type} name - description\n * @returns {Type} description\n */
+  python:
+    - Use docstrings for all modules, classes, and functions
+    - Follow Google Python Style Guide format
+    - Document parameters, return types, and exceptions
+    - Include usage examples for public APIs
+    - Format: """Description.\n\nArgs:\n    param: description\n\nReturns:\n    type: description\n"""
+
+repositoryDocumentation:
+  structure:
+    - /docs/api/         # API documentation and endpoints
+    - /docs/components/  # React component documentation
+    - /docs/setup/       # Installation and configuration
+    - /docs/adr/        # Architecture decisions
+    - /docs/features/   # Feature documentation
+  requirements:
+    - Each code file must have a corresponding .md file in the docs repo
+    - Documentation must be versioned with code changes
+    - Include code examples and usage patterns
+    - Document dependencies and requirements
+    - Maintain API documentation with OpenAPI/Swagger specs
 
 # END OF FILE

@@ -2,23 +2,50 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { getHealthStatus } from './services/api'
 
+/**
+ * Main Home component for the application.
+ * Displays the application's landing page with health status monitoring and navigation links.
+ * Features:
+ * - Real-time API health status monitoring
+ * - Responsive layout with mobile and desktop support
+ * - Integration with Vercel deployment
+ * - Quick access links to documentation and resources
+ * @returns {JSX.Element} The rendered Home component
+ */
 export default function Home() {
-  const [message, setMessage] = useState<string>('');
+  // State management for API health monitoring and error handling
+  const [healthStatus, setHealthStatus] = useState<string>('Loading...');
+  const [error, setError] = useState<string | null>(null);
 
+  /**
+   * Effect hook to fetch and monitor API health status
+   * Runs once on component mount
+   */
   useEffect(() => {
-    fetch('/api/python')
-      .then(res => res.text())
-      .then(data => setMessage(data));
+    getHealthStatus()
+      .then(data => setHealthStatus(data.status))
+      .catch(error => {
+        console.error('Error fetching health check:', error);
+        setError(error.message);
+        setHealthStatus('Error loading status');
+      });
   }, []);
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          API Response:&nbsp;
-          <code className="font-mono font-bold">{message}</code>
-        </p>
+        <div className="fixed left-0 top-0 flex w-full flex-col gap-4 justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
+          <p>
+            API Health:&nbsp;
+            <code className="font-mono font-bold">{healthStatus}</code>
+          </p>
+        </div>
         <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
           <a
             className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
