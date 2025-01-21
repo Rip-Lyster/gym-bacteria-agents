@@ -1,0 +1,428 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Gym Bacteria API",
+    "version": "1.0.0",
+    "description": "API for managing training plans and workouts"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5328",
+      "description": "Local development server"
+    }
+  ],
+  "paths": {
+    "/api/users": {
+      "post": {
+        "summary": "Create a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["access_key", "nickname"],
+                "properties": {
+                  "access_key": {
+                    "type": "string",
+                    "description": "Unique identifier for the user"
+                  },
+                  "nickname": {
+                    "type": "string",
+                    "description": "User's display name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully"
+          },
+          "400": {
+            "description": "Invalid request data"
+          }
+        }
+      }
+    },
+    "/api/users/{access_key}": {
+      "get": {
+        "summary": "Get user by access key",
+        "parameters": [
+          {
+            "name": "access_key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "User's unique access key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User data retrieved successfully"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete user by access key",
+        "parameters": [
+          {
+            "name": "access_key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "User's unique access key"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User deleted successfully"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/users/{user_id}/training-plans": {
+      "get": {
+        "summary": "Get all training plans for a user",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of training plans"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/api/training-plans": {
+      "post": {
+        "summary": "Create a new training plan",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["user_id", "name", "start_date", "end_date"],
+                "properties": {
+                  "user_id": {
+                    "type": "integer",
+                    "description": "ID of the user creating the plan"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the training plan"
+                  },
+                  "start_date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Start date (YYYY-MM-DD)"
+                  },
+                  "end_date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "End date (YYYY-MM-DD)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Training plan created successfully"
+          },
+          "400": {
+            "description": "Invalid request data"
+          }
+        }
+      }
+    },
+    "/api/training-plans/{plan_id}": {
+      "get": {
+        "summary": "Get training plan by ID",
+        "parameters": [
+          {
+            "name": "plan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the training plan"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Training plan data retrieved successfully"
+          },
+          "404": {
+            "description": "Training plan not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete training plan by ID",
+        "parameters": [
+          {
+            "name": "plan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the training plan"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Training plan deleted successfully"
+          },
+          "404": {
+            "description": "Training plan not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/exercise-types": {
+      "get": {
+        "summary": "Get all exercise types",
+        "responses": {
+          "200": {
+            "description": "List of exercise types"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new exercise type",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "category"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the exercise type"
+                  },
+                  "category": {
+                    "type": "string",
+                    "description": "Exercise category"
+                  },
+                  "parameters": {
+                    "type": "object",
+                    "description": "Optional exercise parameters"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Exercise type created successfully"
+          },
+          "400": {
+            "description": "Invalid request data"
+          }
+        }
+      }
+    },
+    "/api/exercise-types/{type_id}": {
+      "delete": {
+        "summary": "Delete exercise type by ID",
+        "parameters": [
+          {
+            "name": "type_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the exercise type"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Exercise type deleted successfully"
+          },
+          "404": {
+            "description": "Exercise type not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/workouts": {
+      "post": {
+        "summary": "Create a new workout",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["training_plan_id", "name", "planned_date"],
+                "properties": {
+                  "training_plan_id": {
+                    "type": "integer",
+                    "description": "ID of the associated training plan"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Workout name"
+                  },
+                  "planned_date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Planned date (YYYY-MM-DD)"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["planned", "completed", "skipped"],
+                    "default": "planned",
+                    "description": "Workout status"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Workout created successfully"
+          },
+          "400": {
+            "description": "Invalid request data"
+          }
+        }
+      }
+    },
+    "/api/workouts/{workout_id}": {
+      "patch": {
+        "summary": "Update workout status",
+        "parameters": [
+          {
+            "name": "workout_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the workout"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["status"],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": ["planned", "completed", "skipped"],
+                    "description": "New workout status"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Workout status updated successfully"
+          },
+          "400": {
+            "description": "Invalid status value"
+          },
+          "404": {
+            "description": "Workout not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete workout by ID",
+        "parameters": [
+          {
+            "name": "workout_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the workout"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Workout deleted successfully"
+          },
+          "404": {
+            "description": "Workout not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/workouts/plan/{plan_id}": {
+      "get": {
+        "summary": "Get all workouts for a training plan",
+        "parameters": [
+          {
+            "name": "plan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the training plan"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of workouts"
+          },
+          "404": {
+            "description": "Training plan not found"
+          }
+        }
+      }
+    }
+  }
+} 
