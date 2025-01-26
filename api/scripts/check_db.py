@@ -5,7 +5,10 @@ from dotenv import load_dotenv
 load_dotenv('.env.development.local')
 
 database_url = os.getenv('DATABASE_URL')
-if database_url and database_url.startswith('postgres://'):
+if not database_url:
+    raise ValueError("DATABASE_URL environment variable is not set")
+
+if database_url.startswith('postgres://'):
     database_url = database_url.replace('postgres://', 'postgresql://', 1)
 
 engine = create_engine(database_url)

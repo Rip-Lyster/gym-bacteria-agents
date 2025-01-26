@@ -1,5 +1,6 @@
 from flask import Flask, jsonify
 from flask_swagger_ui import get_swaggerui_blueprint
+from flask_migrate import Migrate
 from .core.config import get_config
 from .routes import users, training_plans, exercise_types, workouts
 from flask_talisman import Talisman
@@ -16,8 +17,9 @@ def create_app():
     app.config.from_object(config)
     
     # Initialize extensions
-    from .core.models import init_db
+    from .core.models import init_db, db
     init_db(app)
+    migrate = Migrate(app, db)
     
     # Environment settings
     env = os.getenv('FLASK_ENV', 'development')

@@ -5,16 +5,21 @@ from sqlalchemy import pool
 from alembic import context
 from dotenv import load_dotenv
 import sys
+from pathlib import Path
 
-# Load environment variables
-load_dotenv('../.env.development.local')
+# Add the api directory to the Python path
+api_dir = Path(__file__).resolve().parent.parent
+sys.path.append(str(api_dir))
+
+# Load environment variables from the correct location
+load_dotenv(api_dir / '.env.development.local')
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
 # Override sqlalchemy.url with environment variable
-database_url = os.getenv('DATABASE_URL', 'postgresql://localhost/gym_bacteria')
+database_url = os.getenv('DATABASE_URL_UNPOOLED', os.getenv('DATABASE_URL', 'postgresql://localhost/gym_bacteria'))
 if database_url.startswith('postgres://'):
     database_url = database_url.replace('postgres://', 'postgresql://', 1)
 config.set_main_option('sqlalchemy.url', database_url)
@@ -22,13 +27,16 @@ config.set_main_option('sqlalchemy.url', database_url)
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    try:
+        fileConfig(config.config_file_name)
+    except FileNotFoundError:
+        # Skip if config file doesn't exist
+        pass
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from core.models import User, TrainingPlan, ExerciseType, Workout
-target_metadata = User.metadata
+from core.models import db
+target_metadata = db.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
