@@ -1,0 +1,223 @@
+---
+description: Use these rules when working with the Flask backend API, including routes, models, database interactions, and API-specific utilities. This covers all Python code in the API service, configuration, and related scripts.
+globs: api/**/*.py, api/**/*.env*, api/**/*.ini
+---
+# Gym Bacteria API - Development Context
+
+You are an expert in Python, Flask, Postgresql, NeonDB, Alembic, Security and scalable API development.
+
+## Project Purpose and Philosophy
+The Gym Bacteria API is a specialized backend service designed to support intelligent workout and training plan management. The project's core mission is to provide a robust foundation for:
+
+1. **Training Plan Management**: Structured organization of long-term fitness goals into manageable blocks and workouts
+2. **Progress Tracking**: Detailed logging of exercises, sets, and performance metrics
+3. **Intelligent Adaptation**: Support for various progression models in strength and conditioning
+
+The architecture emphasizes:
+- Clean separation of concerns
+- Type safety and validation
+- Efficient data access patterns
+- Scalable and maintainable code structure
+
+## Domain Model
+The system is built around these core entities:
+
+- **Users**: Athletes/trainers who create and follow training plans
+- **Training Plans**: Long-term programs (e.g., 12-week strength cycle)
+- **Training Blocks**: Focused periods within a plan (e.g., hypertrophy block)
+- **Workouts**: Individual training sessions
+- **Exercises**: Specific movements with sets, reps, and load
+- **Exercise Types**: Template definitions for exercises
+
+### Entity Relationships
+```
+User
+ └── Training Plans
+      └── Training Blocks
+           └── Workouts
+                └── Exercises
+                     └── Exercise Types
+```
+
+## Technical Stack
+- **Framework**: Flask (chosen for simplicity and flexibility)
+- **Database**: PostgreSQL via NeonDB (serverless, auto-scaling)
+- **ORM**: SQLAlchemy with Flask-SQLAlchemy
+- **API Style**: RESTful with JSON
+- **Documentation**: OpenAPI/Swagger
+- **Security**: Talisman, CORS, environment-based configs
+
+## Project Structure
+```
+api/
+├── core/           # Domain logic and shared resources
+│   ├── models.py   # SQLAlchemy models (domain entities)
+│   ├── config.py   # Environment configuration
+│   └── validation.py # Input validation rules
+├── routes/         # API endpoints by domain
+│   ├── users.py
+│   ├── training_plans.py
+│   ├── training_blocks.py
+│   ├── exercise_types.py
+│   └── workouts.py
+├── scripts/        # Maintenance and setup tools
+├── migrations/     # Database schema versions
+├── static/         # API documentation assets
+│   └── swagger.json  # OpenAPI specification
+├── app.py         # Application factory
+├── run_dev.py     # Development server
+└── .env.development.local  # Local settings
+```
+
+## Development Standards
+
+### Code Organization
+- Follow domain-driven design principles
+- Keep route handlers thin, business logic in core
+- Use type hints consistently
+- Document all public interfaces
+- Validate inputs at system boundaries
+
+### Naming Conventions
+- **Functions**: snake_case, verb_noun format
+  - Good: `create_workout`, `validate_training_plan`
+  - Avoid: `workout`, `planValidation`
+- **Variables**: snake_case with descriptive prefixes
+  - Good: `is_active`, `has_completed_workout`
+  - Avoid: `flag`, `done`
+- **Classes**: PascalCase, noun-based
+  - Good: `TrainingPlan`, `WorkoutSession`
+  - Avoid: `training`, `handle_workout`
+
+### Code Patterns
+
+#### Route Handler Pattern
+```python
+@bp.route("/training-plans", methods=["POST"])
+def create_training_plan():
+    """Create a new training plan.
+    
+    Pattern:
+    1. Validate input
+    2. Process business logic
+    3. Handle database transaction
+    4. Return response
+    """
+    try:
+        data = request.get_json()
+        validate_training_plan(data)
+        
+        plan = create_plan_in_db(data)
+        
+        return jsonify(plan.to_dict()), 201
+    except ValidationError as e:
+        return handle_validation_error(e)
+```
+
+#### Model Pattern
+```python
+class TrainingBlock(db.Model):
+    """Training block within a plan.
+    
+    Pattern:
+    1. Define schema
+    2. Establish relationships
+    3. Add helper methods
+    4. Include type hints
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    
+    # Relationships follow schema
+    workouts = relationship("Workout", back_populates="block")
+    
+    def calculate_volume(self) -> float:
+        """Calculate total volume for the block."""
+        return sum(w.total_volume for w in self.workouts)
+```
+
+### Error Handling Philosophy
+- Fail fast and explicitly
+- Use custom exceptions for domain errors
+- Provide actionable error messages
+- Log errors with context
+- Return consistent error responses
+
+### Database Interactions
+- Use connection pooling for efficiency
+- Implement proper transaction management
+- Follow SQLAlchemy best practices
+- Use appropriate cascade behaviors
+- Maintain referential integrity
+
+### API Design Principles
+- Use resource-based URLs
+- Implement proper HTTP methods
+- Return appropriate status codes
+- Version endpoints appropriately
+- Document with OpenAPI/Swagger
+
+### Security Considerations
+- Validate all inputs
+- Use environment variables for secrets
+- Implement proper CORS policies
+- Use HTTPS in production
+- Rate limit sensitive endpoints
+
+## Development Workflow
+1. **Local Development**:
+   - Use NeonDB (PostgreSQL) without connection pooling
+     ```
+     # Development database URLs
+     DATABASE_URL="postgres://user:pass@host/db?sslmode=require"        # Pooled connection
+     DATABASE_URL_UNPOOLED="postgresql://user:pass@host/db?sslmode=require"  # Direct connection
+     ```
+   - Run with Flask development server (`python run_dev.py`)
+   - Enable debug mode
+   - Use `.env.development.local` for environment variables
+   - SSL certificates provided (cert.pem, key.pem)
+
+2. **Production Deployment**:
+   - Use NeonDB (PostgreSQL) production instance
+   - Run with Gunicorn
+   - Enable SSL/TLS
+   - Use production configurations
+   - Strict CORS and security policies
+
+## Common Patterns and Idioms
+```python
+# Input validation pattern
+def validate_input(data: dict) -> None:
+    if not data.get("required_field"):
+        raise ValidationError("required_field is required")
+
+# Database transaction pattern
+def create_resource(data: dict) -> Model:
+    try:
+        resource = Model(**data)
+        db.session.add(resource)
+        db.session.commit()
+        return resource
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        raise DatabaseError(str(e))
+
+# Response formatting pattern
+def format_response(data: Any, status: int = 200) -> tuple:
+    return jsonify({
+        "data": data,
+        "timestamp": datetime.utcnow().isoformat()
+    }), status
+```
+
+## Key Considerations for AI
+When working with this codebase:
+1. Always validate inputs at system boundaries
+2. Maintain consistent error handling patterns
+3. Follow the established project structure
+4. Use type hints and documentation
+5. Consider database performance
+6. Maintain API consistency
+7. Follow security best practices
+
+Remember: This is a fitness-focused application where data consistency and user experience are crucial. All changes should maintain or improve these aspects. 

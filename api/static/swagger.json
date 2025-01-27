@@ -38,7 +38,14 @@
         },
         "responses": {
           "201": {
-            "description": "User created successfully"
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid request data"
@@ -62,7 +69,14 @@
         ],
         "responses": {
           "200": {
-            "description": "User data retrieved successfully"
+            "description": "User data retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
           },
           "404": {
             "description": "User not found"
@@ -88,9 +102,6 @@
           },
           "404": {
             "description": "User not found"
-          },
-          "500": {
-            "description": "Internal server error"
           }
         }
       }
@@ -111,7 +122,17 @@
         ],
         "responses": {
           "200": {
-            "description": "List of training plans"
+            "description": "List of training plans",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrainingPlan"
+                  }
+                }
+              }
+            }
           },
           "404": {
             "description": "User not found"
@@ -128,7 +149,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["user_id", "name", "start_date", "end_date"],
+                "required": ["user_id", "name"],
                 "properties": {
                   "user_id": {
                     "type": "integer",
@@ -137,6 +158,14 @@
                   "name": {
                     "type": "string",
                     "description": "Name of the training plan"
+                  },
+                  "progression_type": {
+                    "type": "string",
+                    "description": "Type of progression (e.g., linear, undulating)"
+                  },
+                  "target_weekly_hours": {
+                    "type": "integer",
+                    "description": "Target training hours per week"
                   },
                   "start_date": {
                     "type": "string",
@@ -155,7 +184,14 @@
         },
         "responses": {
           "201": {
-            "description": "Training plan created successfully"
+            "description": "Training plan created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrainingPlan"
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid request data"
@@ -163,51 +199,108 @@
         }
       }
     },
-    "/api/training-plans/{plan_id}": {
+    "/api/training-blocks": {
+      "post": {
+        "summary": "Create a new training block",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["plan_id", "name", "primary_focus", "duration_weeks", "sequence_order"],
+                "properties": {
+                  "plan_id": {
+                    "type": "integer",
+                    "description": "ID of the training plan"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the training block"
+                  },
+                  "primary_focus": {
+                    "type": "string",
+                    "description": "Primary training focus (e.g., Strength, Hypertrophy)"
+                  },
+                  "duration_weeks": {
+                    "type": "integer",
+                    "description": "Duration of the block in weeks"
+                  },
+                  "sequence_order": {
+                    "type": "integer",
+                    "description": "Order of the block within the plan"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Training block created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrainingBlock"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request data"
+          }
+        }
+      }
+    },
+    "/api/training-blocks/{block_id}": {
       "get": {
-        "summary": "Get training plan by ID",
+        "summary": "Get training block by ID",
         "parameters": [
           {
-            "name": "plan_id",
+            "name": "block_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "integer"
             },
-            "description": "ID of the training plan"
+            "description": "ID of the training block"
           }
         ],
         "responses": {
           "200": {
-            "description": "Training plan data retrieved successfully"
+            "description": "Training block data retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrainingBlock"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Training plan not found"
+            "description": "Training block not found"
           }
         }
       },
       "delete": {
-        "summary": "Delete training plan by ID",
+        "summary": "Delete training block by ID",
         "parameters": [
           {
-            "name": "plan_id",
+            "name": "block_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "integer"
             },
-            "description": "ID of the training plan"
+            "description": "ID of the training block"
           }
         ],
         "responses": {
           "204": {
-            "description": "Training plan deleted successfully"
+            "description": "Training block deleted successfully"
           },
           "404": {
-            "description": "Training plan not found"
-          },
-          "500": {
-            "description": "Internal server error"
+            "description": "Training block not found"
           }
         }
       }
@@ -217,7 +310,17 @@
         "summary": "Get all exercise types",
         "responses": {
           "200": {
-            "description": "List of exercise types"
+            "description": "List of exercise types",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExerciseType"
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -239,9 +342,9 @@
                     "type": "string",
                     "description": "Exercise category"
                   },
-                  "parameters": {
-                    "type": "object",
-                    "description": "Optional exercise parameters"
+                  "description": {
+                    "type": "string",
+                    "description": "Detailed description of the exercise"
                   }
                 }
               }
@@ -250,37 +353,17 @@
         },
         "responses": {
           "201": {
-            "description": "Exercise type created successfully"
+            "description": "Exercise type created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExerciseType"
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid request data"
-          }
-        }
-      }
-    },
-    "/api/exercise-types/{type_id}": {
-      "delete": {
-        "summary": "Delete exercise type by ID",
-        "parameters": [
-          {
-            "name": "type_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            },
-            "description": "ID of the exercise type"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Exercise type deleted successfully"
-          },
-          "404": {
-            "description": "Exercise type not found"
-          },
-          "500": {
-            "description": "Internal server error"
           }
         }
       }
@@ -294,11 +377,11 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["training_plan_id", "name", "planned_date"],
+                "required": ["block_id", "name", "planned_date", "sequence_order"],
                 "properties": {
-                  "training_plan_id": {
+                  "block_id": {
                     "type": "integer",
-                    "description": "ID of the associated training plan"
+                    "description": "ID of the training block"
                   },
                   "name": {
                     "type": "string",
@@ -309,11 +392,32 @@
                     "format": "date",
                     "description": "Planned date (YYYY-MM-DD)"
                   },
+                  "actual_date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Actual date performed (YYYY-MM-DD)"
+                  },
                   "status": {
                     "type": "string",
                     "enum": ["planned", "completed", "skipped"],
                     "default": "planned",
                     "description": "Workout status"
+                  },
+                  "sequence_order": {
+                    "type": "integer",
+                    "description": "Order within the training block"
+                  },
+                  "exercises": {
+                    "type": "object",
+                    "description": "Exercise details and logs",
+                    "properties": {
+                      "exercises": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/Exercise"
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -322,104 +426,263 @@
         },
         "responses": {
           "201": {
-            "description": "Workout created successfully"
+            "description": "Workout created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Workout"
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid request data"
           }
         }
       }
-    },
-    "/api/workouts/{workout_id}": {
-      "patch": {
-        "summary": "Update workout status",
-        "parameters": [
-          {
-            "name": "workout_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            },
-            "description": "ID of the workout"
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "access_key": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "last_access": {
+            "type": "string",
+            "format": "date-time"
           }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["status"],
-                "properties": {
-                  "status": {
-                    "type": "string",
-                    "enum": ["planned", "completed", "skipped"],
-                    "description": "New workout status"
+        }
+      },
+      "TrainingPlan": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "progression_type": {
+            "type": "string"
+          },
+          "target_weekly_hours": {
+            "type": "integer"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "TrainingBlock": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "plan_id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "primary_focus": {
+            "type": "string"
+          },
+          "duration_weeks": {
+            "type": "integer"
+          },
+          "sequence_order": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ExerciseType": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Exercise": {
+        "type": "object",
+        "properties": {
+          "exercise_type_id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sequence": {
+            "type": "integer"
+          },
+          "planned": {
+            "type": "object",
+            "properties": {
+              "sets": {
+                "type": "integer"
+              },
+              "reps": {
+                "type": ["string", "integer"],
+                "description": "Can be a fixed number or a range (e.g., '5-5-5')"
+              },
+              "rpe": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10,
+                "description": "Rate of Perceived Exertion (1-10)"
+              },
+              "rest_minutes": {
+                "type": "integer"
+              },
+              "notes": {
+                "type": "string"
+              }
+            }
+          },
+          "logs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "timestamp": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "sets": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "reps": {
+                        "type": "integer"
+                      },
+                      "weight": {
+                        "type": "string"
+                      },
+                      "rpe": {
+                        "type": "number"
+                      }
+                    }
                   }
+                },
+                "notes": {
+                  "type": "string"
+                },
+                "perceived_effort": {
+                  "type": "integer"
+                },
+                "completed": {
+                  "type": "boolean"
                 }
               }
             }
           }
-        },
-        "responses": {
-          "200": {
-            "description": "Workout status updated successfully"
-          },
-          "400": {
-            "description": "Invalid status value"
-          },
-          "404": {
-            "description": "Workout not found"
-          }
         }
       },
-      "delete": {
-        "summary": "Delete workout by ID",
-        "parameters": [
-          {
-            "name": "workout_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            },
-            "description": "ID of the workout"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Workout deleted successfully"
+      "Workout": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
           },
-          "404": {
-            "description": "Workout not found"
+          "block_id": {
+            "type": "integer"
           },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/api/workouts/plan/{plan_id}": {
-      "get": {
-        "summary": "Get all workouts for a training plan",
-        "parameters": [
-          {
-            "name": "plan_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            },
-            "description": "ID of the training plan"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of workouts"
+          "name": {
+            "type": "string"
           },
-          "404": {
-            "description": "Training plan not found"
+          "planned_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "actual_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["planned", "completed", "skipped"]
+          },
+          "sequence_order": {
+            "type": "integer"
+          },
+          "exercises": {
+            "type": "object",
+            "properties": {
+              "exercises": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Exercise"
+                }
+              }
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       }

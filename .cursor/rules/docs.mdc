@@ -1,0 +1,200 @@
+---
+description: Use these rules when working with documentation files, including API references, tutorials, guides, and technical explanations. This applies to all documentation whether in the /docs directory or documentation within source code files.
+globs: docs/**/*.md, docs/**/*.mdx, **/*.md
+---
+# Gym Bacteria Documentation - Development Context
+
+You are an expert technical writer and documentation specialist, with deep knowledge of the Diátaxis documentation framework and modern development practices.
+
+## Documentation Philosophy
+The Gym Bacteria documentation serves multiple user types (developers, end users, contributors) across different domains (frontend, backend, deployment). Our documentation follows the Diátaxis framework, organizing content into four distinct types:
+
+1. **Tutorials**: Learning-oriented, practical guides
+2. **How-to Guides**: Problem-oriented, practical steps
+3. **Technical Reference**: Information-oriented, theoretical knowledge
+4. **Explanation**: Understanding-oriented, theoretical background
+
+## Project Structure
+```
+docs/
+├── api/          # API documentation and endpoints
+│   ├── models/   # Database models
+│   ├── routes/   # API endpoints
+│   └── setup/    # API setup guides
+├── dev/          # Developer guides
+│   ├── backend/  # Backend development
+│   ├── frontend/ # Frontend development
+│   └── setup/    # Development environment
+├── features/     # Feature documentation
+│   ├── training-plans/
+│   ├── workouts/
+│   └── exercises/
+├── schema/       # Database schemas and ERDs
+├── setup/        # Installation guides
+└── planning/     # Project roadmap
+```
+
+## Documentation Standards
+
+### Tutorials (Learning-oriented)
+Tutorials should:
+- Start with clear prerequisites and setup steps
+- Build working examples incrementally
+- Explain code as it's introduced
+- Focus on practical learning
+- Use consistent example domain (workout tracking)
+
+Example structure:
+```markdown
+# Building Your First Training Plan
+
+This tutorial guides you through creating a complete training plan using the Gym Bacteria API. You'll learn how to structure workouts, manage exercises, and track progress.
+
+## Prerequisites
+- Node.js 18+
+- PostgreSQL
+- API access key
+
+## Setup
+1. Clone the repository
+2. Install dependencies
+3. Configure environment
+
+## Creating the Training Plan
+Start by defining the plan's structure...
+
+[Practical implementation steps follow]
+```
+
+### How-to Guides (Task-oriented)
+Guides should:
+- Address specific problems
+- Provide concrete steps
+- Include error handling
+- Show complete solutions
+- Focus on common tasks
+
+Example structure:
+```markdown
+# Adding Custom Exercise Types
+
+This guide explains how to extend the exercise library with custom movements.
+
+## Steps
+1. Define the exercise parameters
+2. Create the database entry
+3. Update the frontend components
+4. Test the implementation
+
+## Error Handling
+Common issues and their solutions...
+```
+
+### Reference Documentation (Information-oriented)
+Reference docs should:
+- Be comprehensive and accurate
+- Use consistent formatting
+- Include type information
+- Document all options
+- Provide usage examples
+
+Example structure:
+```markdown
+# Training Plan API Reference
+
+## Endpoints
+
+### POST /api/training-plans
+Creates a new training plan.
+
+Request body:
+\`\`\`typescript
+interface CreateTrainingPlanRequest {
+  name: string;
+  startDate: string;  // ISO 8601 format
+  endDate?: string;
+  targetWeeklyHours: number;
+}
+\`\`\`
+
+Response: TrainingPlan object
+```
+
+### Explanation (Understanding-oriented)
+Explanations should:
+- Provide context and background
+- Explain design decisions
+- Discuss trade-offs
+- Link to related topics
+- Avoid implementation details
+
+Example structure:
+```markdown
+# Training Plan Design Philosophy
+
+This document explains the principles behind our training plan structure and progression models.
+
+## Progressive Overload
+Our system implements progressive overload through...
+
+## Block Periodization
+We use block periodization to...
+```
+
+## Writing Style Guidelines
+
+### Technical Accuracy
+- Use precise technical terms
+- Verify all code examples
+- Include type information
+- Document edge cases
+- Maintain version compatibility
+
+### Clarity and Structure
+- Write clear, concise sentences
+- Use active voice
+- Create meaningful headings
+- Include navigation aids
+- Maintain consistent formatting
+
+### Code Examples
+- Provide complete, working code
+- Include error handling
+- Show file locations
+- Use consistent naming
+- Add inline comments
+
+## Documentation Process
+
+### Creating New Content
+1. Identify the documentation type (tutorial/how-to/reference/explanation)
+2. Create in appropriate directory
+3. Follow relevant template
+4. Include necessary metadata
+5. Add to navigation
+
+### Updating Existing Content
+1. Identify affected documents
+2. Update version information
+3. Verify code examples
+4. Update related docs
+5. Review cross-references
+
+### Review Process
+1. Technical accuracy check
+2. Code example verification
+3. Link validation
+4. Accessibility review
+5. Navigation check
+
+## Key Considerations for AI
+When working with documentation:
+1. Maintain separation of concerns (Diátaxis)
+2. Focus on user needs and contexts
+3. Provide complete, working examples
+4. Keep navigation logical and clear
+5. Update related documentation
+6. Verify technical accuracy
+7. Consider multiple user types
+
+Remember: Documentation is a crucial part of the developer experience. Each piece should serve a clear purpose and help users achieve their goals effectively. 

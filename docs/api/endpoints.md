@@ -131,252 +131,199 @@ For details on how API communication is structured in the frontend, see [ADR 002
 
 # API Endpoints Documentation
 
+## Overview
+This document details the available endpoints in the Gym Bacteria API. All endpoints are prefixed with `/api`.
+
+## Authentication
+Currently using simple access key authentication. Each user has a unique `access_key` that must be provided for user-specific operations.
+
 ## Users
 
 ### Create User
-- **POST** `/api/users`
-- Creates a new user
-- **Request Body**:
-  ```json
-  {
+```http
+POST /users
+Content-Type: application/json
+
+{
     "access_key": "string",
     "nickname": "string"
-  }
-  ```
-- **Response** (201):
-  ```json
-  {
-    "id": "integer",
-    "nickname": "string"
-  }
-  ```
+}
+```
 
 ### Get User
-- **GET** `/api/users/<access_key>`
-- Retrieves user information by access key
-- **Response** (200):
-  ```json
-  {
-    "id": "integer",
-    "nickname": "string"
-  }
-  ```
-- **Error** (404):
-  ```json
-  {
-    "error": "User not found"
-  }
-  ```
+```http
+GET /users/{access_key}
+```
+
+### Delete User
+```http
+DELETE /users/{access_key}
+```
 
 ## Training Plans
 
+### Get User's Training Plans
+```http
+GET /users/{user_id}/training-plans
+```
+
 ### Create Training Plan
-- **POST** `/api/training-plans`
-- Creates a new training plan
-- **Request Body**:
-  ```json
-  {
+```http
+POST /training-plans
+Content-Type: application/json
+
+{
     "user_id": "integer",
     "name": "string",
-    "start_date": "YYYY-MM-DD",
-    "end_date": "YYYY-MM-DD"
-  }
-  ```
-- **Response** (201):
-  ```json
-  {
-    "id": "integer",
-    "name": "string",
-    "start_date": "YYYY-MM-DD",
-    "end_date": "YYYY-MM-DD"
-  }
-  ```
+    "progression_type": "string",     // optional
+    "target_weekly_hours": "integer", // optional
+    "start_date": "YYYY-MM-DD",      // optional
+    "end_date": "YYYY-MM-DD"         // optional
+}
+```
 
-### Get Training Plan
-- **GET** `/api/training-plans/<plan_id>`
-- Retrieves a specific training plan
-- **Response** (200):
-  ```json
-  {
-    "id": "integer",
-    "name": "string",
-    "start_date": "YYYY-MM-DD",
-    "end_date": "YYYY-MM-DD"
-  }
-  ```
-- **Error** (404): Not Found
+## Training Blocks
 
-### Get User's Training Plans
-- **GET** `/api/users/<user_id>/training-plans`
-- Lists all training plans for a user
-- **Response** (200):
-  ```json
-  [
-    {
-      "id": "integer",
-      "name": "string",
-      "start_date": "YYYY-MM-DD",
-      "end_date": "YYYY-MM-DD"
-    }
-  ]
-  ```
+### Create Training Block
+```http
+POST /training-blocks
+Content-Type: application/json
+
+{
+    "plan_id": "integer",
+    "name": "string",
+    "primary_focus": "string",
+    "duration_weeks": "integer",
+    "sequence_order": "integer"
+}
+```
+
+### Get Training Block
+```http
+GET /training-blocks/{block_id}
+```
+
+### Delete Training Block
+```http
+DELETE /training-blocks/{block_id}
+```
 
 ## Exercise Types
 
-### Create Exercise Type
-- **POST** `/api/exercise-types`
-- Creates a new exercise type
-- **Request Body**:
-  ```json
-  {
-    "name": "string",
-    "category": "string",
-    "parameters": {
-      // Optional JSON object with exercise parameters
-    }
-  }
-  ```
-- **Response** (201):
-  ```json
-  {
-    "id": "integer",
-    "name": "string",
-    "category": "string",
-    "parameters": "object"
-  }
-  ```
+### Get All Exercise Types
+```http
+GET /exercise-types
+```
 
-### List Exercise Types
-- **GET** `/api/exercise-types`
-- Retrieves all exercise types
-- **Response** (200):
-  ```json
-  [
-    {
-      "id": "integer",
-      "name": "string",
-      "category": "string",
-      "parameters": "object"
-    }
-  ]
-  ```
+### Create Exercise Type
+```http
+POST /exercise-types
+Content-Type: application/json
+
+{
+    "name": "string",
+    "category": "string",
+    "description": "string"  // optional
+}
+```
 
 ## Workouts
 
 ### Create Workout
-- **POST** `/api/workouts`
-- Creates a new workout with exercises
-- **Request Body**:
-  ```json
-  {
-    "training_plan_id": "integer",
-    "name": "string",
-    "planned_date": "YYYY-MM-DD",
-    "exercises": [
-      {
-        "exercise_type_id": "integer",
-        "sets": "integer",
-        "reps": "integer",
-        "weight": "float?",
-        "notes": "string?"
-      }
-    ],
-    "status": "string (planned|completed|skipped)?"
-  }
-  ```
-- **Response** (201):
-  ```json
-  {
-    "id": "integer",
-    "name": "string",
-    "training_plan_id": "integer",
-    "planned_date": "YYYY-MM-DD",
-    "status": "string",
-    "exercises": [
-      {
-        "id": "integer",
-        "exercise_type_id": "integer",
-        "exercise_name": "string",
-        "sets": "integer",
-        "reps": "integer",
-        "weight": "float?",
-        "notes": "string?",
-        "order": "integer"
-      }
-    ]
-  }
-  ```
+```http
+POST /workouts
+Content-Type: application/json
 
-### Update Workout
-- **PATCH** `/api/workouts/<workout_id>`
-- Updates workout details and status
-- **Request Body**:
-  ```json
-  {
-    "name": "string?",
-    "planned_date": "YYYY-MM-DD?",
-    "status": "string (planned|completed|skipped)?",
-    "exercises": [
-      {
-        "exercise_type_id": "integer",
-        "sets": "integer",
-        "reps": "integer",
-        "weight": "float?",
-        "notes": "string?"
-      }
-    ]?
-  }
-  ```
-- **Response** (200):
-  ```json
-  {
-    "id": "integer",
+{
+    "block_id": "integer",
     "name": "string",
     "planned_date": "YYYY-MM-DD",
-    "status": "string",
-    "exercises": [
-      {
-        "id": "integer",
-        "exercise_type_id": "integer",
-        "exercise_name": "string",
-        "sets": "integer",
-        "reps": "integer",
-        "weight": "float?",
-        "notes": "string?",
-        "order": "integer"
-      }
-    ]
-  }
-  ```
-
-### Get Plan Workouts
-- **GET** `/api/workouts/plan/<plan_id>`
-- Lists all workouts for a training plan
-- **Response** (200):
-  ```json
-  [
-    {
-      "id": "integer",
-      "name": "string",
-      "planned_date": "YYYY-MM-DD",
-      "status": "string",
-      "exercises": [
-        {
-          "id": "integer",
-          "exercise_type_id": "integer",
-          "exercise_name": "string",
-          "sets": "integer",
-          "reps": "integer",
-          "weight": "float?",
-          "notes": "string?",
-          "order": "integer"
-        }
-      ]
+    "sequence_order": "integer",
+    "actual_date": "YYYY-MM-DD",     // optional
+    "status": "string",              // optional, default: "planned"
+    "exercises": {
+        "exercises": [
+            {
+                "exercise_type_id": "integer",
+                "name": "string",
+                "sequence": "integer",
+                "planned": {
+                    "sets": "integer",
+                    "reps": "string or integer",
+                    "rpe": "integer (1-10)",
+                    "rest_minutes": "integer",
+                    "notes": "string"
+                }
+            }
+        ]
     }
-  ]
-  ```
+}
+```
 
-### Delete Workout
-- **DELETE** `/api/workouts/<workout_id>`
-- Deletes a workout and its exercises
-- **Response** (204): No Content 
+## Data Structures
+
+### Exercise JSON Structure
+The exercise data is stored as JSONB in the database. Here's the structure:
+
+```json
+{
+    "exercises": [
+        {
+            "exercise_type_id": 1,
+            "name": "Squat",
+            "sequence": 1,
+            "planned": {
+                "sets": 4,
+                "reps": "5-5-5",
+                "rpe": 8,
+                "rest_minutes": 3,
+                "notes": "Focus on depth"
+            },
+            "logs": [
+                {
+                    "timestamp": "2024-01-25T14:30:00",
+                    "sets": [
+                        {
+                            "reps": 5,
+                            "weight": "100kg",
+                            "rpe": 8
+                        },
+                        {
+                            "reps": 5,
+                            "weight": "100kg",
+                            "rpe": 8.5
+                        },
+                        {
+                            "reps": 5,
+                            "weight": "100kg",
+                            "rpe": 9
+                        }
+                    ],
+                    "notes": "Felt strong today",
+                    "perceived_effort": 8,
+                    "completed": true
+                }
+            ]
+        }
+    ]
+}
+```
+
+## Status Codes
+
+- `200` - Success
+- `201` - Created
+- `204` - No Content (successful deletion)
+- `400` - Bad Request
+- `404` - Not Found
+
+## Rate Limiting
+Currently no rate limiting implemented.
+
+## Error Responses
+All error responses follow this format:
+```json
+{
+    "error": "Error message describing what went wrong"
+}
+``` 

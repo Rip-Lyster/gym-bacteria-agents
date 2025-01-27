@@ -68,6 +68,110 @@ Make sure you have the required Python packages:
 pip install psycopg2-binary requests
 ```
 
+## Database Schema
+
+### Users
+```sql
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    access_key VARCHAR(64) UNIQUE NOT NULL,
+    nickname VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_access TIMESTAMP
+);
+```
+
+### Training Plans
+```sql
+CREATE TABLE training_plans (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    progression_type VARCHAR(50),
+    target_weekly_hours INTEGER,
+    start_date DATE,
+    end_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Training Blocks
+```sql
+CREATE TABLE training_blocks (
+    id SERIAL PRIMARY KEY,
+    plan_id INTEGER REFERENCES training_plans(id) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    primary_focus VARCHAR(50) NOT NULL,
+    duration_weeks INTEGER NOT NULL,
+    sequence_order INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Exercise Types
+```sql
+CREATE TABLE exercise_types (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Workouts
+```sql
+CREATE TABLE workouts (
+    id SERIAL PRIMARY KEY,
+    block_id INTEGER REFERENCES training_blocks(id) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    planned_date DATE NOT NULL,
+    actual_date DATE,
+    status VARCHAR(20) NOT NULL DEFAULT 'planned',
+    sequence_order INTEGER NOT NULL,
+    exercises JSONB NOT NULL DEFAULT '{"exercises": []}',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Exercise JSON Structure
+```json
+{
+    "exercises": [
+        {
+            "exercise_type_id": 1,
+            "name": "Squat",
+            "sequence": 1,
+            "planned": {
+                "sets": 4,
+                "reps": "5-5-5",
+                "rpe": 8,
+                "rest_minutes": 3,
+                "notes": "Focus on depth"
+            },
+            "logs": [
+                {
+                    "timestamp": "2024-01-25T14:30:00",
+                    "sets": [
+                        {"reps": 5, "weight": "100kg", "rpe": 8},
+                        {"reps": 5, "weight": "100kg", "rpe": 8.5},
+                        {"reps": 5, "weight": "100kg", "rpe": 9}
+                    ],
+                    "notes": "Felt strong today",
+                    "perceived_effort": 8,
+                    "completed": true
+                }
+            ]
+        }
+    ]
+}
+```
+
 ## Sample Data
 
 ### Populating the Database
@@ -79,8 +183,8 @@ python api/scripts/populate_dev_db.py
 This script creates:
 - Sample users
 - Exercise types
-- Training plans
-- Sample workouts
+- Training plans with blocks
+- Sample workouts with exercises
 
 ### Sample Data Details
 
@@ -97,32 +201,35 @@ users = [
 ```python
 exercise_types = [
     ExerciseType(
+        name='Squat',
+        category='Strength',
+        description='Compound lower body exercise targeting quads, hamstrings, and core'
+    ),
+    ExerciseType(
         name='Bench Press',
         category='Strength',
-        parameters={'sets': 3, 'reps': '8-12', 'rest': '90s'}
+        description='Upper body push exercise for chest, shoulders, and triceps'
     ),
     ExerciseType(
-        name='Squats',
+        name='Deadlift',
         category='Strength',
-        parameters={'sets': 4, 'reps': '6-8', 'rest': '120s'}
-    ),
-    ExerciseType(
-        name='Pull-ups',
-        category='Bodyweight',
-        parameters={'sets': 3, 'reps': 'max', 'rest': '60s'}
+        description='Full body compound exercise focusing on posterior chain'
     ),
     ExerciseType(
         name='Running',
         category='Cardio',
-        parameters={'duration': '30min', 'intensity': 'moderate'}
+        description='Cardiovascular endurance training'
     )
 ]
 ```
 
-#### Training Plans & Workouts
-- Each user gets a 12-week training plan
-- Each plan includes 3 sample workouts
-- Workout types: Push Day, Pull Day, Leg Day, Cardio, Full Body
+#### Training Plans & Blocks
+Each user gets:
+- 12-week training plan
+- 3 training blocks (4 weeks each):
+  1. Hypertrophy Block (RPE 7-8)
+  2. Strength Block (RPE 8-9)
+  3. Peak Block (RPE 9-10)
 
 ## Development Scripts
 
@@ -143,11 +250,6 @@ Verifies database connection and lists available schemas and tables.
 ```python
 python api/scripts/check_db.py
 ```
-
-## Switching Environments
-To switch between environments:
-- Development: `cp .env.development.local .env`
-- Production: `cp .env.production.local .env`
 
 ## Best Practices
 1. Never commit environment files (`.env*`) to version control

@@ -4,6 +4,11 @@ from ..core.models import db, User, TrainingPlan
 from ..core.validation import validate_request_data
 from sqlalchemy.exc import IntegrityError
 from typing import Dict, Any
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 def validate_request_data(data: Dict[str, Any], required_fields: list) -> None:
     """Validate that all required fields are present in the request data.
@@ -68,15 +73,37 @@ def get_user(access_key):
     Returns:
         User data or 404 if not found
     """
-    user = User.query.filter_by(access_key=access_key).first()
-    if not user:
-        abort(404)
+    logger.debug(f"Attempting to find user with access_key: {access_key}")
+    
+    # Log database connection info
+    logger.debug(f"Database URL: {db.engine.url}")
+    
+    try:
+        # Try to find the user
+        user = User.query.filter_by(access_key=access_key).first()
+        logger.debug(f"Query result: {user}")
         
-    return jsonify({
-        'id': user.id,
-        'nickname': user.nickname,
-        'access_key': user.access_key
-    })
+        if not user:
+            logger.debug("No user found with this access key")
+            return jsonify({
+                'error': 'User not found',
+                'message': f'No user found with access key: {access_key}'
+            }), 404
+            
+        response_data = {
+            'id': user.id,
+            'nickname': user.nickname,
+            'access_key': user.access_key
+        }
+        logger.debug(f"Returning user data: {response_data}")
+        return jsonify(response_data)
+        
+    except Exception as e:
+        logger.error(f"Error while looking up user: {str(e)}", exc_info=True)
+        return jsonify({
+            'error': 'Database error',
+            'message': 'An error occurred while looking up the user'
+        }), 500
 
 @bp.route('/<int:user_id>/training-plans', methods=['GET'])
 def get_user_training_plans(user_id):

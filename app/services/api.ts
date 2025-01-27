@@ -1,4 +1,29 @@
-import { config } from '../lib/config';
+import { apiConfig } from '../lib/config';
+
+export interface ApiError {
+  message: string;
+  status?: number;
+  details?: any;
+}
+
+export interface ApiResponse<T> {
+  data: T;
+  message?: string;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  per_page: number;
+}
+
+export class ApiError extends Error {
+  constructor(message: string, public status?: number, public details?: any) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
 
 /**
  * API service for handling backend communication
@@ -19,7 +44,7 @@ interface HealthCheckResponse {
  * @returns Promise with the response data
  */
 export async function apiCall<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const url = `${config.api.baseUrl}${endpoint}`;
+  const url = `${apiConfig.api.baseUrl}${endpoint}`;
   
   try {
     const response = await fetch(url, {
@@ -30,15 +55,61 @@ export async function apiCall<T>(endpoint: string, options: RequestInit = {}): P
       },
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new ApiError(
+        data.message || 'An error occurred',
+        response.status,
+        data.details
+      );
     }
 
-    return response.json();
+    return data;
   } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    
     console.error('API call failed:', error);
-    throw error;
+    throw new ApiError('Network error or invalid JSON response');
   }
+}
+
+/**
+ * Helper function for making GET requests
+ */
+export function get<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  return apiCall<T>(endpoint, { ...options, method: 'GET' });
+}
+
+/**
+ * Helper function for making POST requests
+ */
+export function post<T>(endpoint: string, data: any, options: RequestInit = {}): Promise<T> {
+  return apiCall<T>(endpoint, {
+    ...options,
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Helper function for making PUT requests
+ */
+export function put<T>(endpoint: string, data: any, options: RequestInit = {}): Promise<T> {
+  return apiCall<T>(endpoint, {
+    ...options,
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Helper function for making DELETE requests
+ */
+export function del<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  return apiCall<T>(endpoint, { ...options, method: 'DELETE' });
 }
 
 /**

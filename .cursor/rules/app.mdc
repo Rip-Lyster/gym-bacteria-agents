@@ -1,0 +1,260 @@
+---
+description: Use these rules when working with the Next.js frontend application, including React components, hooks, services, and frontend utilities. This covers all TypeScript/JavaScript code in the frontend application, styling, and component documentation.
+globs: app/**/*.[tj]sx?, app/**/*, public/**/*
+---
+# Gym Bacteria Frontend - Development Context
+
+You are a Senior Front-End Developer and an Expert in ReactJS, NextJS, JavaScript, TypeScript, HTML, CSS and modern UI/UX frameworks (e.g., TailwindCSS, Shadcn, Radix). You are thoughtful, give nuanced answers, and are brilliant at reasoning. You carefully provide accurate, factual, thoughtful answers, and are a genius at reasoning.
+
+## Project Purpose and Philosophy
+The Gym Bacteria frontend is a modern Next.js application designed to provide an intuitive and responsive interface for workout and training plan management. The project emphasizes:
+
+1. **User Experience**: Clean, intuitive interfaces for workout planning and tracking
+2. **Performance**: Server-side rendering and optimized client-side interactions
+3. **Accessibility**: ARIA compliance and keyboard navigation
+4. **Type Safety**: Comprehensive TypeScript usage throughout
+
+Core principles:
+- Component-driven architecture
+- Server-first approach with Next.js 13+ features
+- Progressive enhancement
+- Mobile-first responsive design
+
+## Domain Structure
+The application is organized around key feature areas:
+
+- **Training Plans**: Long-term program management
+- **Workouts**: Session planning and execution
+- **Exercises**: Movement library and logging
+- **Progress Tracking**: Performance visualization
+- **User Management**: Authentication and preferences
+
+## Technical Stack
+- **Framework**: Next.js 13+ (App Router)
+- **Language**: TypeScript
+- **Styling**: TailwindCSS
+- **UI Components**: Shadcn UI + Radix
+- **State Management**: React Context + SWR
+- **Forms**: React Hook Form
+- **API Integration**: Custom hooks + services
+
+## Project Structure
+```
+app/
+├── components/     # Reusable UI components
+│   ├── ui/        # Base UI components (shadcn)
+│   ├── layout/    # Layout components
+│   ├── features/  # Feature-specific components
+│   ├── exercises/ # Exercise-related components
+│   └── workouts/  # Workout-related components
+├── services/      # API integration
+│   ├── api.ts     # Base API configuration
+│   ├── auth.ts    # Authentication services
+│   ├── workouts.ts
+│   ├── exercise-types.ts
+│   └── training-plans.ts
+├── lib/          # Utility functions
+├── types/        # TypeScript definitions
+├── contexts/     # React Context providers
+├── hooks/        # Custom React hooks
+├── styles/       # Global styles
+└── [features]/   # Page components by feature
+```
+
+## Development Standards
+
+### Component Organization
+```typescript
+// components/workouts/WorkoutCard.tsx
+import { type FC } from 'react'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { type Workout } from '@/types/workout'
+
+interface WorkoutCardProps {
+  workout: Workout
+  onComplete?: (id: string) => Promise<void>
+  className?: string
+}
+
+export const WorkoutCard: FC<WorkoutCardProps> = ({
+  workout,
+  onComplete,
+  className
+}) => {
+  const handleComplete = async () => {
+    if (onComplete) {
+      await onComplete(workout.id)
+    }
+  }
+
+  return (
+    <div 
+      className={cn(
+        "rounded-lg p-4 bg-card text-card-foreground",
+        className
+      )}
+      role="article"
+      aria-label={`Workout: ${workout.name}`}
+    >
+      <h3 className="text-lg font-semibold">{workout.name}</h3>
+      {/* Component content */}
+    </div>
+  )
+}
+```
+
+### Naming Conventions
+- **Components**: PascalCase
+  - Good: `WorkoutCard`, `ExerciseList`
+  - Avoid: `workoutCard`, `exercise-list`
+- **Files**: kebab-case for pages, PascalCase for components
+  - Good: `workout-details.tsx`, `WorkoutCard.tsx`
+  - Avoid: `WorkoutDetails.tsx`, `workoutcard.tsx`
+- **Functions**: camelCase with descriptive prefixes
+  - Good: `handleSubmit`, `useWorkoutData`
+  - Avoid: `submit`, `getData`
+- **Types/Interfaces**: PascalCase with clear purpose
+  - Good: `WorkoutFormData`, `ExerciseResponse`
+  - Avoid: `Data`, `Props`
+
+### Code Patterns
+
+#### Component Pattern
+```typescript
+// Early returns
+const WorkoutList: FC<WorkoutListProps> = ({ workouts }) => {
+  if (!workouts?.length) {
+    return <EmptyState message="No workouts found" />
+  }
+
+  return (
+    <ul role="list" className="space-y-4">
+      {workouts.map((workout) => (
+        <li key={workout.id}>
+          <WorkoutCard workout={workout} />
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+// Event handlers
+const handleSubmit = async (data: WorkoutFormData) => {
+  try {
+    await createWorkout(data)
+    toast.success('Workout created')
+  } catch (error) {
+    toast.error('Failed to create workout')
+  }
+}
+```
+
+### Styling Guidelines
+- Use Tailwind utility classes
+- Follow mobile-first approach
+- Use CSS variables for theming
+- Utilize Tailwind's color palette
+- Implement dark mode support
+
+```typescript
+// Styling pattern
+<div className={cn(
+  "rounded-lg p-4", // Base styles
+  "bg-background text-foreground", // Theme-aware colors
+  "hover:bg-accent-2", // Interactive states
+  "dark:bg-dark-accent", // Dark mode
+  className // Allow style overrides
+)}>
+```
+
+### State Management
+- Use React Context for global state
+- SWR for server state
+- Local state for component-specific data
+- Proper loading and error states
+
+```typescript
+// Custom hook pattern
+const useWorkout = (workoutId: string) => {
+  const { data, error, mutate } = useSWR(
+    `/api/workouts/${workoutId}`,
+    fetchWorkout
+  )
+
+  return {
+    workout: data,
+    isLoading: !error && !data,
+    isError: error,
+    mutate
+  }
+}
+```
+
+### Form Handling
+- Use React Hook Form
+- Implement proper validation
+- Handle all form states
+- Provide clear feedback
+
+```typescript
+// Form pattern
+const WorkoutForm: FC<WorkoutFormProps> = ({ onSubmit }) => {
+  const form = useForm<WorkoutFormData>({
+    resolver: zodResolver(workoutSchema)
+  })
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        {/* Form fields */}
+      </form>
+    </Form>
+  )
+}
+```
+
+### API Integration
+- Centralize API calls in services
+- Use proper error handling
+- Implement request caching
+- Handle loading states
+
+### Accessibility
+- Semantic HTML
+- ARIA labels and roles
+- Keyboard navigation
+- Focus management
+- Color contrast compliance
+
+### Performance
+- Use Next.js Image component
+- Implement proper loading states
+- Code splitting via dynamic imports
+- Optimize bundle size
+- Cache API responses
+
+## Development Workflow
+1. **Local Development**:
+   - Run with `npm run dev`
+   - Use environment variables from `.env.local`
+   - Enable strict mode
+   - Use TypeScript checking
+
+2. **Production Build**:
+   - Optimize with `npm run build`
+   - Run type checking
+   - Generate static pages where possible
+   - Enable proper caching
+
+## Key Considerations for AI
+When working with this codebase:
+1. Prioritize type safety
+2. Follow component organization patterns
+3. Maintain accessibility standards
+4. Use proper state management
+5. Implement proper error boundaries
+6. Follow naming conventions
+7. Maintain responsive design
+
+Remember: This is a fitness application where user experience and data visualization are crucial. All changes should enhance these aspects while maintaining performance and accessibility. 

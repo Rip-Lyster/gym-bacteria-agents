@@ -1,110 +1,141 @@
-# API Structure Documentation
+# API Structure
+
+## Overview
+The Gym Bacteria API is built using Flask and follows a modular architecture. The API is organized around core entities: Users, Training Plans, Training Blocks, Exercise Types, and Workouts.
 
 ## Directory Structure
-
 ```
 api/
-├── core/               # Core application components
-│   ├── config.py      # Database and app configuration
-│   └── models.py      # SQLAlchemy models
-├── routes/            # API route definitions
-│   └── api.py        # Main API endpoints
-├── scripts/          # Development and maintenance scripts
-│   └── check_db.py   # Database connection verification
-├── migrations/       # Alembic database migrations
-├── __init__.py      # Package initialization
-├── index.py         # Application entry point
-└── alembic.ini      # Alembic configuration
+├── __init__.py           # Flask app initialization
+├── core/
+│   ├── __init__.py
+│   └── models.py         # SQLAlchemy models
+├── routes/
+│   ├── __init__.py
+│   ├── users.py
+│   ├── training_plans.py
+│   ├── training_blocks.py
+│   ├── exercise_types.py
+│   └── workouts.py
+├── scripts/
+│   ├── check_db.py
+│   ├── config_env.py
+│   └── populate_dev_db.py
+└── static/
+    └── swagger.json      # OpenAPI specification
 ```
 
-## Component Details
+## Core Entities
 
-### Core Components
+### User
+- Represents a user in the system
+- Identified by unique access_key
+- Can have multiple training plans
+- Properties: id, access_key, nickname, timestamps
 
-#### config.py
-- Database configuration using SQLAlchemy
-- Environment variable loading
-- Database connection initialization
+### Training Plan
+- Top-level container for organizing training
+- Belongs to a user
+- Contains multiple training blocks
+- Properties: name, progression_type, target_weekly_hours, dates
 
-#### models.py
-- SQLAlchemy model definitions
-- Database schema representation
-- Relationship definitions between models:
-  - User -> Training Plans (one-to-many)
-  - Training Plan -> Workouts (one-to-many)
-  - Workout -> Exercise Types (many-to-many via workout_exercises)
-  - Exercise Types (referenced by workout_exercises)
+### Training Block
+- Represents a specific phase in a training plan
+- Examples: Hypertrophy, Strength, Peak
+- Contains multiple workouts
+- Properties: name, primary_focus, duration_weeks, sequence_order
 
-### Routes
+### Exercise Type
+- Template for exercises
+- Properties: name, category, description
+- Used as reference in workout exercises
 
-#### api.py
-Implements RESTful endpoints for:
-- Users management
-- Training plans CRUD
-- Exercise types management
-- Workout management with exercises
-  - Create/update workouts with exercises
-  - Status management
-  - Exercise selection and configuration
+### Workout
+- Individual training session
+- Contains exercises and their parameters
+- Stores both planned and actual performance
+- Properties: name, dates, status, sequence_order
+- Exercises stored as JSONB with detailed structure
 
-### Development Scripts
+## Data Flow
 
-#### check_db.py
-Database verification script that:
-- Validates database connection
-- Lists available schemas
-- Shows current tables
-- Helps in development debugging
-
-### Database Migrations
-
-The `migrations/` directory contains Alembic-managed database migrations:
-- Version-controlled schema changes
-- Upgrade and downgrade paths
-- Migration history tracking
-
-## Environment Setup
-
-The application requires:
-- Python 3.12+
-- PostgreSQL (via Neon.tech)
-- Environment variables in `.env.development.local`:
-  - DATABASE_URL
-  - Other configuration variables
-
-## Running the Application
-
-1. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
+1. User Authentication
+   ```
+   Client -> access_key -> API -> User Lookup
    ```
 
-2. Run migrations:
-   ```bash
-   cd api
-   alembic upgrade head
+2. Training Plan Creation
+   ```
+   User -> Training Plan -> Training Blocks -> Workouts
    ```
 
-3. Start the server:
-   ```bash
-   python api/index.py
+3. Workout Flow
+   ```
+   Plan Selection -> Block Selection -> Workout Creation -> Exercise Logging
    ```
 
-## Development Guidelines
+## Exercise Data Structure
 
-1. **Database Changes**
-   - Always use Alembic migrations
-   - Create new migration: `alembic revision --autogenerate -m "description"`
-   - Apply migrations: `alembic upgrade head`
+### Planned Exercise
+```json
+{
+    "exercise_type_id": 1,
+    "name": "Squat",
+    "sequence": 1,
+    "planned": {
+        "sets": 4,
+        "reps": "5-5-5",
+        "rpe": 8,
+        "rest_minutes": 3,
+        "notes": "Focus on depth"
+    }
+}
+```
 
-2. **Adding New Routes**
-   - Place in appropriate file under `routes/`
-   - Follow RESTful principles
-   - Include proper error handling
-   - Document in OpenAPI/Swagger format
+### Exercise Log
+```json
+{
+    "timestamp": "2024-01-25T14:30:00",
+    "sets": [
+        {
+            "reps": 5,
+            "weight": "100kg",
+            "rpe": 8
+        }
+    ],
+    "notes": "Felt strong today",
+    "perceived_effort": 8,
+    "completed": true
+}
+```
 
-3. **Model Changes**
-   - Update `models.py`
-   - Create corresponding migration
-   - Update related routes
-   - Update documentation 
+## Authentication
+- Simple access key authentication
+- Access key required for all user-specific operations
+- No rate limiting currently implemented
+
+## Database
+- PostgreSQL via Vercel
+- SQLAlchemy ORM
+- JSONB for flexible exercise data
+- Separate development and production databases
+
+## Best Practices
+
+### Route Organization
+- Routes grouped by entity
+- Consistent error handling
+- Clear parameter validation
+- Proper HTTP method usage
+
+### Data Validation
+- Required fields enforced
+- Type checking
+- Relationship integrity
+- Sequence ordering
+
+### Response Format
+- Consistent JSON structure
+- Clear error messages
+- Appropriate status codes
+- Standardized timestamps 
